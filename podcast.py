@@ -4,6 +4,7 @@ https://github.com/bbelderbos/Codesnippets/blob/master/python/ferriss_podcast_ta
 """
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from functools import wraps, partial
 from urllib.request import urlopen
 import re
 
@@ -12,21 +13,31 @@ podcast_url = "http://fourhourworkweek.com/podcast/"
 tag = re.compile(r'tag-[^" ]+')
 
 
+def retry(func=None, *, times=3):
+    if func is None:
+        return partial(retry, times=times)
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        attempt = 0
+        while attempt < times:
+            try:
+                 return func(*args, **kwargs)
+            except Exception as exc:
+                attempt += 1
+                print(f"Exception {func}: {exc} (attempt: {attempt})")
+        return func(*args, **kwargs)
+    return wrapper
+
+
+@retry
 def get_index():
     """
     http://stackoverflow.com/questions/24346872/python-equivalent-of-a-given-wget-command
     """
-    attempts = 0
-    while attempts < 3:
-        try:
-            response = urlopen(podcast_url, timeout = 5)
-            content = response.read()
-            with open( filename, 'w' ) as f:
-                f.write( content )
-            break
-        except Exception as exc:
-            attempts += 1
-            print(exc)
+    response = urlopen(podcast_url, timeout = 5)
+    content = response.read()
+    with open( filename, 'w' ) as f:
+        f.write( content )
 
 
 def parse_feed():
