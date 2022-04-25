@@ -55,7 +55,7 @@ def parse_feed():
             mtags = TAG_REXEG.findall(line)
             tags = [tag.replace("tag-", " ") for tag in mtags]
             res.extend(tags)
-    ret = Counter(res).most_common()
+    ret = Counter(res)
     return ret
 
 
@@ -63,13 +63,9 @@ def main():
     get_index(podcast_url)
     res = parse_feed()
 
-    order = []
-    for t, tot in res.items():
-        order.append( (tot, "%-50s | %s" % (t, "+"*tot) ) )
-
-    for (tot, line) in reversed(sorted(order)):
-        if tot > 1:
-            print(line)
+    for tag, count in res.most_common():
+        if count > 1:
+            print(f"{tag:30} | {count}")
 
 
 if __name__ == "__main__":
