@@ -1,30 +1,38 @@
-# https://github.com/bbelderbos/Codesnippets/blob/master/python/ferriss_podcast_tags.py
+"""
+Script from
+https://github.com/bbelderbos/Codesnippets/blob/master/python/ferriss_podcast_tags.py
+"""
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import urllib2
+from urllib.request import urlopen
 import re
 
 filename = "index.html"
 podcast_url = "http://fourhourworkweek.com/podcast/"
 
-# http://stackoverflow.com/questions/24346872/python-equivalent-of-a-given-wget-command
 def get_index():
+    """
+    http://stackoverflow.com/questions/24346872/python-equivalent-of-a-given-wget-command
+    """
     attempts = 0
     while attempts < 3:
         try:
-            response = urllib2.urlopen(podcast_url, timeout = 5)
+            response = urlopen(podcast_url, timeout = 5)
             content = response.read()
             f = open( filename, 'w' )
             f.write( content )
             f.close()
             break
-        except urllib2.URLError as e:
+        except Exception as exc:
             attempts += 1
-            print type(e)
+            print(exc)
+
 
 def parse_feed():
+    """
+    http://stackoverflow.com/questions/6213063/python-read-next
+    """
     res = {}
-    # http://stackoverflow.com/questions/6213063/python-read-next
     with open(filename, 'r+') as f:
         for line in f:
             if not line.strip():
@@ -52,4 +60,4 @@ if __name__ == "__main__":
 
     for (tot, line) in reversed(sorted(order)):
         if tot > 2:
-            print line
+            print(line)
