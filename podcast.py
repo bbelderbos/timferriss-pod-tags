@@ -21,9 +21,8 @@ def get_index():
         try:
             response = urlopen(podcast_url, timeout = 5)
             content = response.read()
-            f = open( filename, 'w' )
-            f.write( content )
-            f.close()
+            with open( filename, 'w' ) as f:
+                f.write( content )
             break
         except Exception as exc:
             attempts += 1
