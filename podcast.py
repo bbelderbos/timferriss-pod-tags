@@ -16,12 +16,16 @@ def parse_feed(url):
     return Counter(tags)
 
 
+def show_results(tags, min_tags=1):
+    for tag, count in tags.most_common():
+        if count > min_tags:
+            print(f"{tag:30} | {count}")
+
+
 def main():
     podcast_url = "http://fourhourworkweek.com/podcast/"
-    res = parse_feed(podcast_url)
-    for tag, count in res.most_common():
-        if count > 1:
-            print(f"{tag:30} | {count}")
+    tags = parse_feed(podcast_url)
+    show_results(tags)
 
 
 if __name__ == "__main__":
