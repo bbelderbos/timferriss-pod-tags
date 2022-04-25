@@ -8,6 +8,9 @@ from functools import wraps, partial
 from urllib.request import urlopen
 import re
 
+import bs4
+import requests
+
 filename = "index.html"
 podcast_url = "http://fourhourworkweek.com/podcast/"
 tag = re.compile(r'tag-[^" ]+')
@@ -30,14 +33,13 @@ def retry(func=None, *, times=3):
 
 
 @retry
-def get_index():
+def get_index(url):
     """
     http://stackoverflow.com/questions/24346872/python-equivalent-of-a-given-wget-command
     """
-    response = urlopen(podcast_url, timeout = 5)
-    content = response.read()
-    with open( filename, 'w' ) as f:
-        f.write( content )
+    resp = requests.get(url)
+    with open(filename, 'w') as f:
+        f.write(resp.text)
 
 
 def parse_feed():
@@ -45,8 +47,9 @@ def parse_feed():
     http://stackoverflow.com/questions/6213063/python-read-next
     """
     res = {}
-    with open(filename, 'r+') as f:
+    with open(filename, 'r') as f:
         for line in f:
+            print(line)
             if not line.strip():
                 continue
             if 'id="post-' in line:
@@ -62,7 +65,7 @@ def parse_feed():
 
 
 def main():
-    get_index()
+    get_index(podcast_url)
     res = parse_feed()
 
     order = []
