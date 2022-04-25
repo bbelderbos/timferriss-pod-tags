@@ -4,16 +4,17 @@ https://github.com/bbelderbos/Codesnippets/blob/master/python/ferriss_podcast_ta
 """
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from collections import Counter
 from functools import wraps, partial
-from urllib.request import urlopen
 import re
+from urllib.request import urlopen
 
 import bs4
 import requests
 
 filename = "index.html"
 podcast_url = "http://fourhourworkweek.com/podcast/"
-tag = re.compile(r'tag-[^" ]+')
+TAG_REXEG = re.compile(r'tag-[^" ]+')
 
 
 def retry(func=None, *, times=3):
@@ -46,22 +47,16 @@ def parse_feed():
     """
     http://stackoverflow.com/questions/6213063/python-read-next
     """
-    res = {}
+    res = []
     with open(filename, 'r') as f:
         for line in f:
-            print(line)
-            if not line.strip():
+            if 'tag-' not in line:
                 continue
-            if 'id="post-' in line:
-                mtags = tag.findall(line)
-                tags = [t.lstrip("tag").replace("-", " ") for t in mtags]
-                for t in tags:
-                    if "ferris" in t or "podcast" in t or "show" in t:
-                        continue
-                    if t not in res:
-                        res[t] = 0
-                    res[t] += 1
-    return res
+            mtags = TAG_REXEG.findall(line)
+            tags = [tag.replace("tag-", " ") for tag in mtags]
+            res.extend(tags)
+    ret = Counter(res).most_common()
+    return ret
 
 
 def main():
@@ -73,7 +68,7 @@ def main():
         order.append( (tot, "%-50s | %s" % (t, "+"*tot) ) )
 
     for (tot, line) in reversed(sorted(order)):
-        if tot > 2:
+        if tot > 1:
             print(line)
 
 
