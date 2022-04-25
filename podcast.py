@@ -9,6 +9,8 @@ import re
 
 filename = "index.html"
 podcast_url = "http://fourhourworkweek.com/podcast/"
+tag = re.compile(r'tag-[^" ]+')
+
 
 def get_index():
     """
@@ -48,10 +50,9 @@ def parse_feed():
                     res[t] += 1
     return res
 
-if __name__ == "__main__":
+
+def main():
     get_index()
-    tag = re.compile(r'tag-[^" ]+')
-    date = re.compile(r'201\d/\d{2}/\d{2}')
     res = parse_feed()
 
     order = []
@@ -61,3 +62,7 @@ if __name__ == "__main__":
     for (tot, line) in reversed(sorted(order)):
         if tot > 2:
             print(line)
+
+
+if __name__ == "__main__":
+    main()
